@@ -2,188 +2,234 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Académie des Sommets - 5ème</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Académie des Sommets</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #09090b; --card: #18181b; --accent: #3b82f6;
             --success: #10b981; --text: #f4f4f5; --gold: #fbbf24;
-            --danger: #ef4444;
+            --danger: #ef4444; --border: #27272a;
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Poppins', sans-serif; background-color: var(--bg);
-            color: var(--text); margin: 0; display: flex; justify-content: center;
-            min-height: 100vh;
+            color: var(--text); margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: flex-start;
+            min-height: 100vh; width: 100%;
         }
 
-        #app-container { width: 100%; max-width: 500px; padding: 20px; }
+        #app-container { 
+            width: 100%; max-width: 600px; padding: 1rem; 
+            display: flex; flex-direction: column; gap: 1rem;
+        }
+
         .hidden { display: none !important; }
 
         .card {
-            background: var(--card); border: 1px solid #27272a;
-            border-radius: 24px; padding: 20px; margin-bottom: 20px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 1.5rem; padding: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            width: 100%;
         }
+
+        h1 { font-size: clamp(1.5rem, 5vw, 2rem); margin: 0 0 0.5rem 0; color: white; }
+        h2 { font-size: clamp(1.2rem, 4vw, 1.5rem); margin: 0; }
+        p { font-size: 0.95rem; line-height: 1.5; opacity: 0.9; }
 
         button {
             background: var(--accent); color: white; border: none;
-            padding: 16px; border-radius: 16px; cursor: pointer;
-            font-weight: 600; transition: all 0.2s; width: 100%; margin-top: 10px;
+            padding: 1rem; border-radius: 1rem; cursor: pointer;
+            font-weight: 600; font-size: 1rem; transition: transform 0.1s;
+            width: 100%; margin-top: 0.75rem;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
         }
 
-        button:active { transform: scale(0.96); }
-        .btn-papa { background: #f97316; border-bottom: 4px solid #c2410c; margin-top: 20px;}
-        .btn-subject { background: #27272a; text-align: left; border: 1px solid #3f3f46; margin-top: 8px;}
-        .btn-reset { background: transparent; border: 1px solid #3f3f46; color: #71717a; font-size: 0.8rem; margin-top: 30px; }
+        button:active { transform: scale(0.98); opacity: 0.9; }
+        .btn-papa { background: #f97316; border-bottom: 4px solid #c2410c; }
+        .btn-subject { background: #27272a; text-align: left; border: 1px solid var(--border); justify-content: flex-start; }
+        .btn-reset { background: transparent; color: #71717a; font-size: 0.8rem; margin-top: 2rem; border: 1px dashed #333; }
 
-        .xp-bar-container { background: #27272a; height: 10px; border-radius: 5px; overflow: hidden; margin: 10px 0; }
+        .xp-bar-container { background: #27272a; height: 12px; border-radius: 6px; overflow: hidden; margin: 1rem 0; }
         .xp-fill { background: linear-gradient(90deg, var(--gold), #f59e0b); width: 0%; height: 100%; transition: 1s ease; }
 
-        .mood-btn { font-size: 2.5rem; background: none; border: none; cursor: pointer; padding: 10px; }
-        
+        .mood-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin: 1rem 0; }
+        .mood-btn { font-size: 2.5rem; background: #27272a; border-radius: 1rem; padding: 0.5rem; border: 1px solid var(--border); width: 100%; }
+
         input {
-            width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #3f3f46; 
-            background: #09090b; color: white; box-sizing: border-box; margin-bottom: 10px;
+            width: 100%; padding: 1rem; border-radius: 0.75rem; border: 1px solid var(--border); 
+            background: #09090b; color: white; font-size: 1rem; margin-bottom: 0.5rem;
         }
 
-        #game-canvas { background: #000; border-radius: 20px; border: 2px solid var(--gold); width: 100%; touch-action: none; }
+        #game-wrapper { width: 100%; position: relative; margin: 1rem 0; aspect-ratio: 3/4; }
+        #game-canvas { 
+            background: #000; border-radius: 1rem; border: 2px solid var(--gold); 
+            width: 100%; height: 100%; touch-action: none; 
+        }
+
+        #file-preview img { width: 100%; border-radius: 1rem; margin-top: 1rem; border: 1px solid var(--accent); }
     </style>
 </head>
 <body>
 
 <div id="app-container">
     <div id="screen-setup" class="card hidden">
-        <h1>Bienvenue Champion</h1>
+        <h1>L'Académie</h1>
         <p>Prêt pour ton ascension ?</p>
         <input type="text" id="in-name" placeholder="Ton prénom">
-        <button onclick="saveProfile()">Créer mon profil</button>
+        <button onclick="saveProfile()">Commencer la mission 🚀</button>
     </div>
 
     <div id="screen-mood" class="card hidden" style="text-align: center;">
-        <h2 id="mood-greeting">Salut !</h2>
-        <p>Comment te sens-tu pour tes défis aujourd'hui ?</p>
-        <div style="display: flex; justify-content: center; gap: 10px;">
+        <h2>Salut Champion !</h2>
+        <p>Comment te sens-tu aujourd'hui ?</p>
+        <div class="mood-grid">
             <button class="mood-btn" onclick="logMood('🚀', 'À fond !')">🚀</button>
-            <button class="mood-btn" onclick="logMood('🎯', 'Concentré')">🎯</button>
-            <button class="mood-btn" onclick="logMood('😴', 'Fatigué')">😴</button>
-            <button class="mood-btn" onclick="logMood('🤔', 'Incertain')">🤔</button>
+            <button class="mood-btn" onclick="logMood('🎯', 'Focus')">🎯</button>
+            <button class="mood-btn" onclick="logMood('😴', 'K.O.')">😴</button>
+            <button class="mood-btn" onclick="logMood('🤔', 'Bof')">🤔</button>
         </div>
     </div>
 
     <div id="screen-goal" class="card hidden">
-        <h2>Ton Objectif Hebdo</h2>
-        <p>Combien d'XP veux-tu atteindre cette semaine ?</p>
-        <input type="number" id="in-goal" placeholder="Ex: 200">
-        <button onclick="saveGoal()">Valider mon contrat</button>
+        <h2>Ton Contrat</h2>
+        <p>Combien d'XP vises-tu cette semaine ?</p>
+        <input type="number" id="in-goal" placeholder="Ex: 300">
+        <button onclick="saveGoal()">Signer mon contrat ✍️</button>
     </div>
 
     <div id="screen-main" class="hidden">
         <div class="card">
-            <h2 id="txt-greeting" style="margin:0;">Salut !</h2>
-            <p id="txt-mood" style="font-style: italic; color: var(--success); margin: 5px 0;"></p>
+            <h2 id="txt-greeting">Salut !</h2>
+            <p id="txt-mood" style="color: var(--success); font-weight: 600;"></p>
             
-            <div style="margin-top: 15px;">
-                <span style="font-size: 0.8rem;">Objectif de la semaine : <b id="goal-val">0</b> XP</span>
+            <div style="margin-top: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.8;">
+                    <span>Objectif hebdo</span>
+                    <span><b id="xp-current">0</b> / <b id="goal-val">0</b> XP</span>
+                </div>
                 <div class="xp-bar-container"><div id="goal-fill" class="xp-fill"></div></div>
             </div>
             
-            <p style="font-size: 0.8rem; opacity: 0.8;">Score Total : <span id="xp-total" style="color:var(--gold); font-weight:bold;">0</span> XP</p>
-            <button class="btn-papa" onclick="shareWithPapa()">⭐ Envoyer mon score à Papa</button>
+            <button class="btn-papa" onclick="shareWithPapa()">⭐ Partager ma réussite à Papa</button>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
-            <button class="btn-subject" onclick="showSection('section-quiz')">📝 <b>Quiz du jour</b> (Réels 5ème)</button>
-            <button class="btn-subject" onclick="showSection('section-import')">📸 <b>Réviser mes cours</b></button>
+        <div style="display: grid; gap: 0.75rem; margin-top: 1rem;">
+            <button class="btn-subject" onclick="showSection('section-quiz')"><span>📝</span> <b>Défis 5ème</b></button>
+            <button class="btn-subject" onclick="showSection('section-import')"><span>📸</span> <b>Mes Cahiers de cours</b></button>
         </div>
 
-        <div id="section-quiz" class="section hidden card">
-            <h3 style="color:var(--gold);">Défis 5ème</h3>
-            <div id="quiz-content">
-                <button class="btn-subject" onclick="startQuiz('maths')">📐 Maths : Relatifs & Fractions</button>
-                <button class="btn-subject" onclick="startQuiz('anglais')">🇬🇧 Anglais : Le Prétérit</button>
-                <button class="btn-subject" onclick="startQuiz('espagnol')">🇪🇸 Espagnol : Présent & Famille</button>
-            </div>
-            <button onclick="closeSections()" style="background:#333; margin-top:20px;">Retour</button>
-        </div>
+        <button class="btn-reset" onclick="fullReset()">Réinitialiser mon compte</button>
+    </div>
 
-        <div id="section-game" class="section hidden card" style="text-align:center;">
-            <h3 style="color:var(--gold);">CADEAU ! 🎁</h3>
+    <div id="section-quiz" class="section hidden card">
+        <h2 style="color:var(--gold); margin-bottom: 1rem;">Missions d'apprentissage</h2>
+        <div id="quiz-content">
+            <button class="btn-subject" onclick="startQuiz('maths')">📐 Maths : Relatifs & Fractions</button>
+            <button class="btn-subject" onclick="startQuiz('anglais')">🇬🇧 Anglais : Le Passé</button>
+            <button class="btn-subject" onclick="startQuiz('espagnol')">🇪🇸 Espagnol : Présent</button>
+        </div>
+        <button onclick="closeSections()" style="background:#333; margin-top:1.5rem;">⬅️ Retour</button>
+    </div>
+
+    <div id="section-game" class="section hidden card" style="text-align:center;">
+        <h2 style="color:var(--gold);">CADEAU !</h2>
+        <p>Attrape 10 étoiles !</p>
+        <div id="game-wrapper">
             <canvas id="game-canvas" width="300" height="400"></canvas>
-            <p id="game-score">Score : 0 / 10</p>
-            <button onclick="closeSections()" style="background:#333">Quitter le jeu</button>
         </div>
+        <p id="game-score">Score : 0 / 10</p>
+        <button onclick="closeSections()" style="background:#333">Quitter le jeu</button>
+    </div>
 
-        <div id="section-import" class="section hidden card">
-            <h3>Tes cours</h3>
-            <input type="file" accept="image/*" onchange="handleFile(event)">
-            <div id="file-preview"></div>
-            <button onclick="closeSections()" style="background:#333; margin-top:20px;">Retour</button>
-        </div>
-
-        <button class="btn-reset" onclick="fullReset()">Réinitialiser mon Académie</button>
+    <div id="section-import" class="section hidden card">
+        <h2>Bibliothèque de cours</h2>
+        <input type="file" accept="image/*" onchange="handleFile(event)" id="file-up" style="display:none;">
+        <button onclick="document.getElementById('file-up').click()" style="background:var(--success)">➕ Ajouter une photo de cours</button>
+        <div id="file-preview"></div>
+        <button onclick="closeSections()" style="background:#333; margin-top:1.5rem;">⬅️ Retour</button>
     </div>
 </div>
 
 <script>
     let state = { name: "", xp: 0, goal: 0, mood: "" };
+    let audioCtx = null;
 
     const dbQuiz = {
         maths: [
-            { q: "Calcule : (-12) + (+4)", a: ["-16", "-8", "8"], correct: 1 },
-            { q: "Simplifie 20/30", a: ["2/3", "4/6", "1/2"], correct: 0 }
+            { q: "Calcule : $(-15) + (+6)$", a: ["-9", "-21", "9"], correct: 0 },
+            { q: "Simplifie $\\frac{14}{21}$", a: ["2/3", "7/3", "1/2"], correct: 0 }
         ],
         anglais: [
-            { q: "Prétérit de 'SEE' (Voir) :", a: ["Seed", "Saw", "Seen"], correct: 1 },
-            { q: "Traduction de 'Last night' :", a: ["La nuit dernière", "Tard le soir", "Demain soir"], correct: 0 }
+            { q: "Prétérit de 'BUY' (Acheter) :", a: ["Buyed", "Bought", "Boughten"], correct: 1 },
+            { q: "Traduction de 'I was' :", a: ["J'étais", "Je suis", "Je serai"], correct: 0 }
         ],
         espagnol: [
-            { q: "Comment dit-on 'Ma grand-mère' ?", a: ["Mi madre", "Mi tía", "Mi abuela"], correct: 2 },
-            { q: "Yo ____ (ESTAR) en casa.", a: ["Estoy", "Estás", "Está"], correct: 0 }
+            { q: "Comment dit-on 'La cuisine' ?", a: ["La cocina", "El dormitorio", "La sala"], correct: 0 },
+            { q: "Yo ____ (TENER) doce años.", a: ["Tengo", "Tienes", "Tiene"], correct: 0 }
         ]
     };
 
-    window.onload = () => {
-        const saved = localStorage.getItem('sommets_user');
-        if (saved) {
-            state = JSON.parse(saved);
-            showMoodScreen();
-        } else {
-            document.getElementById('screen-setup').classList.remove('hidden');
+    // --- SONS SYNTHÉTISÉS ---
+    function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+    function playSound(type) {
+        if(!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        
+        const now = audioCtx.currentTime;
+        if(type === 'correct') {
+            osc.frequency.setValueAtTime(523.25, now); // C5
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.1); // A5
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(); osc.stop(now + 0.3);
+        } else if (type === 'victory') {
+            [523, 659, 783, 1046].forEach((f, i) => {
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.connect(g); g.connect(audioCtx.destination);
+                o.frequency.value = f;
+                g.gain.setValueAtTime(0.1, now + (i*0.1));
+                g.gain.exponentialRampToValueAtTime(0.01, now + (i*0.1) + 0.4);
+                o.start(now + (i*0.1)); o.stop(now + (i*0.1) + 0.4);
+            });
         }
+    }
+
+    window.onload = () => {
+        const saved = localStorage.getItem('sommets_v5');
+        if (saved) { state = JSON.parse(saved); showMoodScreen(); }
+        else { document.getElementById('screen-setup').classList.remove('hidden'); }
     };
 
     function saveProfile() {
+        initAudio();
         state.name = document.getElementById('in-name').value;
         if (!state.name) return;
-        saveData();
-        showMoodScreen();
+        saveData(); showMoodScreen();
     }
 
-    function showMoodScreen() {
-        document.getElementById('screen-setup').classList.add('hidden');
-        document.getElementById('screen-mood').classList.remove('hidden');
-        document.getElementById('mood-greeting').innerText = `Salut ${state.name} !`;
-    }
+    function showMoodScreen() { hideAll(); document.getElementById('screen-mood').classList.remove('hidden'); }
 
     function logMood(emoji, txt) {
+        initAudio();
         state.mood = emoji + " " + txt;
-        document.getElementById('screen-mood').classList.add('hidden');
         if (state.goal > 0) showDashboard();
-        else document.getElementById('screen-goal').classList.remove('hidden');
+        else { hideAll(); document.getElementById('screen-goal').classList.remove('hidden'); }
     }
 
     function saveGoal() {
         state.goal = parseInt(document.getElementById('in-goal').value);
-        if (state.goal > 0) {
-            saveData();
-            showDashboard();
-        }
+        if (state.goal > 0) { saveData(); showDashboard(); }
     }
 
     function showDashboard() {
-        document.getElementById('screen-goal').classList.add('hidden');
+        hideAll();
         document.getElementById('screen-main').classList.remove('hidden');
         document.getElementById('txt-greeting').innerText = `En avant, ${state.name} !`;
         document.getElementById('txt-mood').innerText = `Humeur : ${state.mood}`;
@@ -191,23 +237,16 @@
     }
 
     function refreshUI() {
-        document.getElementById('xp-total').innerText = state.xp;
+        document.getElementById('xp-current').innerText = state.xp;
         document.getElementById('goal-val').innerText = state.goal;
         let progress = (state.xp / state.goal) * 100;
         document.getElementById('goal-fill').style.width = Math.min(progress, 100) + "%";
         saveData();
     }
 
-    function fullReset() {
-        if (confirm("Attention Champion ! Cela va effacer tes points, ton prénom et ton objectif. Es-tu sûr de vouloir recommencer à zéro ?")) {
-            localStorage.clear();
-            location.reload();
-        }
-    }
-
     function startQuiz(sub) {
         const qData = dbQuiz[sub][Math.floor(Math.random() * dbQuiz[sub].length)];
-        let html = `<h4>${qData.q}</h4>`;
+        let html = `<h3 style="margin-bottom:1.5rem;">${qData.q}</h3>`;
         qData.a.forEach((opt, i) => {
             html += `<button class="btn-subject" onclick="checkAnswer(${i}, ${qData.correct})">${opt}</button>`;
         });
@@ -216,13 +255,11 @@
 
     function checkAnswer(chosen, correct) {
         if (chosen === correct) {
-            state.xp += 40;
-            refreshUI();
-            alert("BRAVO ! +40 XP.");
-            showSection('section-game');
-            initGame();
+            playSound('correct');
+            state.xp += 50; refreshUI();
+            showSection('section-game'); initGame();
         } else {
-            alert("Presque ! Relis bien.");
+            alert("Réessaie encore, tu chauffes !");
         }
         document.getElementById('quiz-content').innerHTML = `
             <button class="btn-subject" onclick="startQuiz('maths')">📐 Maths</button>
@@ -231,30 +268,30 @@
     }
 
     function shareWithPapa() {
-        const msg = `Salut Papa ! Mon moral est ${state.mood}. J'ai ${state.xp} XP sur mon objectif de ${state.goal} ! 🚀`;
+        const msg = `Salut Papa ! Je me sens ${state.mood}. J'ai atteint ${state.xp} XP sur mon objectif de ${state.goal} ! 🏔️`;
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    function showSection(id) {
-        document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-    }
-
-    function closeSections() {
-        document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-    }
+    function showSection(id) { hideAll(); document.getElementById(id).classList.remove('hidden'); }
+    function closeSections() { showDashboard(); }
+    function hideAll() { document.querySelectorAll('.card, .section').forEach(s => s.classList.add('hidden')); }
 
     function handleFile(event) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            document.getElementById('file-preview').innerHTML = `<img src="${e.target.result}" style="width:100%; border-radius:15px; margin-top:10px;">`;
+            document.getElementById('file-preview').innerHTML = `<img src="${e.target.result}" style="width:100%; border-radius:1rem; margin-top:1rem;">`;
         };
         reader.readAsDataURL(event.target.files[0]);
     }
 
-    function saveData() { localStorage.setItem('sommets_user', JSON.stringify(state)); }
+    function fullReset() {
+        if (confirm("Voulez-vous vraiment recommencer à zéro ?")) {
+            localStorage.clear(); location.reload();
+        }
+    }
 
-    // --- MINI JEU ---
+    function saveData() { localStorage.setItem('sommets_v5', JSON.stringify(state)); }
+
     function initGame() {
         const canvas = document.getElementById('game-canvas');
         const ctx = canvas.getContext('2d');
@@ -274,16 +311,22 @@
                 star.y = 0; star.x = Math.random()*270;
             }
             if(caught < 10) requestAnimationFrame(play);
-            else { ctx.fillStyle="white"; ctx.fillText("OBJECTIF ATTEINT !", 80, 200); }
+            else { 
+                playSound('victory');
+                ctx.fillStyle="white"; ctx.font="20px Poppins"; ctx.fillText("MISSION RÉUSSIE !", 60, 200); 
+            }
         }
-        canvas.onmousemove = (e) => {
+
+        const move = (e) => {
             let rect = canvas.getBoundingClientRect();
-            basket.x = (e.clientX - rect.left) * (300 / rect.width) - 25;
+            let touchX = (e.touches ? e.touches[0].clientX : e.clientX);
+            let x = (touchX - rect.left) * (300 / rect.width) - basket.w/2;
+            basket.x = Math.max(0, Math.min(300 - basket.w, x));
+            if(e.touches) e.preventDefault();
         };
-        canvas.ontouchmove = (e) => {
-            let rect = canvas.getBoundingClientRect();
-            basket.x = (e.touches[0].clientX - rect.left) * (300 / rect.width) - 25;
-        };
+
+        canvas.addEventListener('mousemove', move);
+        canvas.addEventListener('touchmove', move, {passive: false});
         play();
     }
 </script>
